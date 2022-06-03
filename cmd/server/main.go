@@ -1,10 +1,18 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
+	"jwt-auth-gin/pkg/app"
 	"os"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
+
+var Users = map[string]string{
+	"user1": "password1",
+	"user2": "password2",
+}
 
 func main() {
 	if err := run(); err != nil {
@@ -14,34 +22,23 @@ func main() {
 }
 
 func run() error {
-
-	// setup database
-	// database is injected to storage as a dependency
-	db, err := setUpDatabase(connectionString)
-
-	// setup up storage
-	// services depend on storage
-	storage := repository.NewStorage(db)
+	storage := storage.NewRepo(Users)
 
 	// setup services
-	// this requires storage, interface between
-	// service specific storage and server
+	authService := api.NewAuthService(storage) // will handle user authorization
+	userService := api.NewUserService(storage) // will handle user manipulation
 
-	// run the migrations
-	//
+	// user gin router with logger and recovery middleware
+	router := gin.Default()
+	// also add global support for cors
+	router.Use(cors.Default())
 
-	// create the server. handles client requests and directs to correct
-	// api endpoint
+	server := app.NewServer(router, userService, authService)
+	err := server.Run()
 
-	// run the server
+	if err != nil {
+		return err
+	}
 
-}
-
-type User struct {
-}
-
-func setUpDatabase(connectionString string) (db *sql.DB, err error) {
-	db = struct {
-		Users map[int]User
-	}{}
+	return nil
 }
