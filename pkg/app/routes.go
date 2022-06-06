@@ -5,7 +5,7 @@ import "github.com/gin-gonic/gin"
 func (s *Server) Routes() *gin.Engine {
 	router := s.router
 
-	router.POST("/signup", s.SignIn())
+	router.POST("/signIn", s.SignIn())
 
 	private := router.Group("private/")
 	private.Use(s.ValidateUser())

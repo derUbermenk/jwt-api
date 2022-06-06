@@ -137,7 +137,7 @@ func (s *Server) GetUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// get user given the usersname
 		userName := c.Param("username")
-		user, err := api.UserService.GetUser(userName)
+		user, err := s.userService.GetUser(userName)
 
 		if err != nil {
 			log.Printf("handler error: %v", err)

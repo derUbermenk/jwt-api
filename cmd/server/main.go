@@ -26,11 +26,11 @@ func main() {
 }
 
 func run() error {
-	storage := repository.NewStorage(Users)
+	storage := repository.NewStorage(jwtKey, Users)
 
 	// setup services
-	authService := api.NewAuthService(storage) // will handle user authorization
-	userService := api.NewUserService(storage) // will handle user manipulation
+	authService := api.NewAuthService(jwtKey, storage) // will handle user authorization
+	userService := api.NewUserService(storage)         // will handle user manipulation
 
 	// user gin router with logger and recovery middleware
 	router := gin.Default()
