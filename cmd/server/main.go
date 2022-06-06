@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"jwt-auth-gin/pkg/api"
 	"jwt-auth-gin/pkg/app"
+	"jwt-auth-gin/pkg/repository"
 	"os"
 
 	"github.com/gin-contrib/cors"
@@ -14,6 +16,8 @@ var Users = map[string]string{
 	"user2": "password2",
 }
 
+var jwtKey = []byte("my_secret_key")
+
 func main() {
 	if err := run(); err != nil {
 		fmt.Fprintf(os.Stderr, "startup error encountered: %s \\n", err)
@@ -22,7 +26,7 @@ func main() {
 }
 
 func run() error {
-	storage := storage.NewRepo(Users)
+	storage := repository.NewStorage(Users)
 
 	// setup services
 	authService := api.NewAuthService(storage) // will handle user authorization
