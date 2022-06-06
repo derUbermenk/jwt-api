@@ -22,6 +22,13 @@ type authService struct {
 	storage AuthRepository
 }
 
+func NewAuthService(jwtKey []byte, authRepo AuthRepository) AuthenticationService {
+	return &authService{
+		jwtKey:  jwtKey,
+		storage: authRepo,
+	}
+}
+
 func (a *authService) ValidateToken(token_string string) (validity bool, username string, err error) {
 	claims := &Claims{}
 
@@ -75,9 +82,7 @@ func (a *authService) ValidateCredentials(creds Credentials) (valid bool, err er
 		return false, err
 	}
 
-	if (user == User{}) {
-		return false, nil
-	} else if user.Password != creds.Password {
+	if user.Password != creds.Password {
 		return false, nil
 	}
 
