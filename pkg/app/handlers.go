@@ -127,7 +127,7 @@ func (s *Server) ValidateUser() gin.HandlerFunc {
 			return
 		}
 
-		tkn_valid, current_user, err := s.authService.ValidateToken(token_string)
+		tkn_valid, current_user, err := s.authService.ValidateAccessToken(token_string)
 
 		if err != nil {
 			log.Printf("Internal Server Error: %v ", err)
