@@ -131,10 +131,19 @@ func (s *Server) ValidateUser() gin.HandlerFunc {
 
 		if err != nil {
 			log.Printf("Internal Server Error: %v ", err)
-			c.JSON(
-				http.StatusInternalServerError,
-				&GenericResponse{Status: false, Message: "bad request"},
-			)
+
+			if err == api.ExpiredAccessTokenError {
+				c.JSON(
+					http.StatusInternalServerError,
+					&GenericResponse{Status: false, Message: "expired access token"},
+				)
+			} else {
+				c.JSON(
+					http.StatusInternalServerError,
+					&GenericResponse{Status: false, Message: "bad request"},
+				)
+			}
+
 			c.Abort()
 			return
 		}
