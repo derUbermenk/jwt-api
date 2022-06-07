@@ -11,9 +11,16 @@ type Credentials struct {
 	Username string `json:"username"`
 }
 
-type Claims struct {
-	Username string `json:"username"`
+type AccessTokenClaims struct {
+	TokenType string `json:"token_type"`
+	Username  string `json:"username"`
 	jwt.RegisteredClaims
+}
+
+type RefreshTokenClaims struct {
+	TokenType string `json:"token_type"`
+	Username  string `json:"username"`
+	CustomKey string `json:"custom_key"`
 }
 
 type User struct {
