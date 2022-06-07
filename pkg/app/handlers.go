@@ -113,10 +113,12 @@ func (s *Server) ValidateUser() gin.HandlerFunc {
 		tkn_valid, current_user, err := s.authService.ValidateToken(token_string)
 
 		if err != nil {
+			log.Printf("Internal Server Error: %v ", err)
 			c.JSON(
-				http.StatusBadRequest,
+				http.StatusInternalServerError,
 				&GenericResponse{Status: false, Message: "bad request"},
 			)
+			c.Abort()
 			return
 		}
 
@@ -125,6 +127,7 @@ func (s *Server) ValidateUser() gin.HandlerFunc {
 				http.StatusUnauthorized,
 				&GenericResponse{Status: false, Message: "User not authenticated"},
 			)
+			c.Abort()
 			return
 		}
 
