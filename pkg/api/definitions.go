@@ -14,6 +14,7 @@ type Credentials struct {
 type AccessTokenClaims struct {
 	TokenType string `json:"token_type"`
 	Username  string `json:"username"`
+
 	jwt.RegisteredClaims
 }
 
@@ -21,6 +22,9 @@ type RefreshTokenClaims struct {
 	TokenType string `json:"token_type"`
 	Username  string `json:"username"`
 	CustomKey string `json:"custom_key"`
+
+	// always add this so that this custom claim can be considered of type jwt.Claims
+	jwt.RegisteredClaims
 }
 
 type User struct {
