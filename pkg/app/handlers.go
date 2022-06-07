@@ -15,7 +15,8 @@ type GenericResponse struct {
 }
 
 type AuthResponse struct {
-	AccessToken string `json:"access_token"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 func (s *Server) SignIn() gin.HandlerFunc {
@@ -73,9 +74,25 @@ func (s *Server) SignIn() gin.HandlerFunc {
 			)
 		}
 
-		access_token, err := s.authService.MakeToken(cred)
+		access_token, err := s.authService.GenerateAccessToken(cred)
 
 		if err != nil {
+			log.Printf("%v", err)
+
+			c.JSON(
+				http.StatusInternalServerError,
+				&GenericResponse{
+					Status: false, Message: "Internal Server Error",
+				},
+			)
+
+			return
+		}
+
+		refresh_token, err := s.authService.GenerateRefreshToken(cred)
+
+		if err != nil {
+			log.Printf("%v", err)
 			c.JSON(
 				http.StatusInternalServerError,
 				&GenericResponse{
@@ -91,7 +108,7 @@ func (s *Server) SignIn() gin.HandlerFunc {
 			&GenericResponse{
 				Status:  true,
 				Message: "Signed in successfully",
-				Data:    &AuthResponse{AccessToken: access_token},
+				Data:    &AuthResponse{AccessToken: access_token, RefreshToken: refresh_token},
 			},
 		)
 	}
