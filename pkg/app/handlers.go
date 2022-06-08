@@ -162,6 +162,43 @@ func (s *Server) ValidateUser() gin.HandlerFunc {
 	}
 }
 
+func (s *Server) ValidateRefreshToken() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// validate the submitted refresh token
+		// 	in the case that it is valid
+		// 	move forward to the next
+		var creds api.Credentials
+		var refresh_token string
+
+		tkn_valid, username, err := s.authService.ValidateRefreshToken(refresh_token)
+
+		if err != nil {
+			log.Printf("Internal Server Error: %v", err)
+
+			c.JSON(
+				http.StatusInternalServerError,
+				&GenericResponse{Status: false, Message: "Bad request"},
+			)
+
+			c.Abort()
+			return
+		}
+
+		if !tkn_valid {
+			c.JSON(
+				http.StatusUnauthorized,
+				&GenericResponse{Status: false, Message: "User not authenticated"},
+			)
+		}
+
+		creds.Username = username
+
+		c.Set("creds", creds)
+		c.Set("refresh_token", refresh_token)
+		c.Next()
+	}
+}
+
 func (s *Server) RefreshAccessToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// assuming the refresh token is confirmed to be valid
@@ -174,10 +211,18 @@ func (s *Server) RefreshAccessToken() gin.HandlerFunc {
 		// pass credentials into generate access token
 		// return that access token
 
-		var refresh_token_string string
-		var creds api.Credentials
+		// get the values needed that are defined in this context
+		// the values returned are interface{} and are thus needed to be asserted
+		creds_interface, _ := c.Get("creds")
+		refresh_token_interface, _ := c.Get("refresh_token")
 
-		access_token_string, err := s.authService.GenerateAccessToken(creds)
+		// .(type) syntax asserts creds_interface to the specified type
+		// https://go.dev/tour/methods/15
+		creds, _ := creds_interface.(api.Credentials)
+		refresh_token, _ := refresh_token_interface.(string)
+
+		// generate the access token
+		access_token, err := s.authService.GenerateAccessToken(creds)
 
 		if err != nil {
 			log.Printf("%v", err)
@@ -198,7 +243,7 @@ func (s *Server) RefreshAccessToken() gin.HandlerFunc {
 			&GenericResponse{
 				Status:  true,
 				Message: "Access Token Refreshed",
-				Data:    &AuthResponse{AccessToken: access_token_string, RefreshToken: refresh_token_string},
+				Data:    &AuthResponse{AccessToken: access_token, RefreshToken: refresh_token},
 			},
 		)
 	}
