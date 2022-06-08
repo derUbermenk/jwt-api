@@ -6,6 +6,7 @@ func (s *Server) Routes() *gin.Engine {
 	router := s.router
 
 	router.POST("/signIn", s.SignIn())
+	router.POST("/session/refresh", s.ValidateRefreshToken(), s.RefreshAccessToken())
 
 	private := router.Group("private/")
 	private.Use(s.ValidateUser())
