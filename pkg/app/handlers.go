@@ -170,6 +170,8 @@ func (s *Server) ValidateRefreshToken() gin.HandlerFunc {
 		var creds api.Credentials
 		var refresh_token string
 
+		refresh_token = c.GetHeader("RefreshToken")
+
 		tkn_valid, username, err := s.authService.ValidateRefreshToken(refresh_token)
 
 		if err != nil {
