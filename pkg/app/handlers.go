@@ -162,6 +162,48 @@ func (s *Server) ValidateUser() gin.HandlerFunc {
 	}
 }
 
+func (s *Server) RefreshAccessToken() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// assuming the refresh token is confirmed to be valid
+		// 		generate an access token
+
+		// decode refresh token
+		// get the user details
+		// user details could be from refresh token claims
+		// use the user.Username and user.Password as Credential variables
+		// pass credentials into generate access token
+		// return that access token
+
+		var refresh_token_string string
+		var creds api.Credentials
+
+		access_token_string, err := s.authService.GenerateAccessToken(creds)
+
+		if err != nil {
+			log.Printf("%v", err)
+
+			c.JSON(
+				http.StatusInternalServerError,
+				&GenericResponse{
+					Status:  false,
+					Message: "Internal Server Error",
+				},
+			)
+
+			return
+		}
+
+		c.JSON(
+			http.StatusOK,
+			&GenericResponse{
+				Status:  true,
+				Message: "Access Token Refreshed",
+				Data:    &AuthResponse{AccessToken: access_token_string, RefreshToken: refresh_token_string},
+			},
+		)
+	}
+}
+
 func (s *Server) GetUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// get user given the usersname
