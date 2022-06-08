@@ -120,10 +120,12 @@ func (s *Server) ValidateUser() gin.HandlerFunc {
 
 		// token_string refers to the base encoded jwt
 		if token_string == "" {
+			log.Printf("Missing token")
 			c.JSON(
 				http.StatusBadRequest,
 				&GenericResponse{Status: false, Message: "token not present"},
 			)
+			c.Abort()
 			return
 		}
 
