@@ -46,14 +46,14 @@ func (a *authService) ValidateAccessToken(token_string string) (validity bool, u
 
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-			return false, "", nil
+			return false, "", SignatureInvalidError
 		}
 
 		// err could also be caused when the jwt token is expired
 		// but compare the error with jwt.ErrTokenExpired does not work
 		// to augment this, I resolved to check the error value instead
 		if strings.Contains(err.Error(), jwt.ErrTokenExpired.Error()) {
-			return false, "", nil
+			return false, "", ExpiredAccessTokenError
 		}
 
 		return false, "", err
